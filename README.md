@@ -8,4 +8,4 @@ The slave actor will be on if:
 - The SlaveActorControl Actor is switched on (manual control)
 
 To install
-sudo git clone http://www.github.com/mrillies/cbpi_SlaveActorControl ~/craftbeerpi3/modules/plugins/cbpi_SlaveActorControl
+- sudo git clone http://www.github.com/mrillies/cbpi_SlaveActorControl ~/craftbeerpi3/modules/plugins/cbpi_SlaveActorControl
