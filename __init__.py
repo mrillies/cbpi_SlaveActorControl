@@ -13,7 +13,7 @@ function_actor_ids = []
 
 
 @cbpi.actor
-class SlaveActor(ActorBase):
+class SlaveActorControl(ActorBase):
 
     actordesc = "Select an actor to be controlled by this group."
     a_actor= Property.Actor("Slave Actor", description= "Actor to be driven if any others on")
