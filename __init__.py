@@ -9,7 +9,7 @@ from modules.core.props import Property
 from modules.core.hardware import ActorBase
 from modules.core.hardware import SensorPassive
 
-function_actor_ids = []
+master_actor_ids = []
 
 
 @cbpi.actor
@@ -50,8 +50,8 @@ class SlaveActorControl(ActorBase):
         if isinstance(self.actor08, unicode) and self.actor08:
             self.actors.append(int(self.actor08))
       
-        if not int(self.id) in function_actor_ids:
-            function_actor_ids.append(int(self.id))  
+        if not int(self.id) in master_actor_ids:
+            master_actor_ids.append(int(self.id))  
     
   
     def execute_func(self):
@@ -61,10 +61,11 @@ class SlaveActorControl(ActorBase):
         for actor in self.actors:
             if cbpi.cache.get("actors").get(actor).state == True:
                 active = True
-        if active == True:
-            self.api.switch_actor_on(self.slave_actor)
-        else:
-            self.api.switch_actor_off(self.slave_actor)
+        if (self.slave_actor is not None) and (cbpi.cache.get("actors").get(self.slave_actor).state != active):
+            if active == True:
+                self.api.switch_actor_on(self.slave_actor)
+            else:
+                self.api.switch_actor_off(self.slave_actor)
   
   
     def set_power(self, power):
@@ -72,23 +73,23 @@ class SlaveActorControl(ActorBase):
             self.api.actor_power(self.slave_actor, power=power)
 
     def on(self, power=None):
+        print "Slave on"
         self.manual_on = True
         if self.slave_actor is not None:
             self.api.switch_actor_on(self.slave_actor)
 
     def off(self):
+        print "Slave off"
         self.manual_on = False
-        if self.slave_actor is not None:
-            self.api.switch_actor_off(self.slave_actor)
         
 @cbpi.backgroundtask(key="actor_execute", interval=.2)
 def actor_execute(api):
-    global function_actor_ids
-    for id in function_actor_ids:
+    global master_actor_ids
+    for id in master_actor_ids:
         actor = cbpi.cache.get("actors").get(id)
         #test for deleted Func actor
         if actor is None:
-            function_actor_ids.remove(id)
+            master_actor_ids.remove(id)
         else:
             try:    # try to call execute. Remove if execute fails. Added back when settings updated
                 actor.instance.execute_func()
@@ -96,6 +97,5 @@ def actor_execute(api):
                 print e
                 cbpi.notify("Actor Error", "Failed to execute actor %s. Please update the configuraiton" % actor.name, type="danger", timeout=0)
                 cbpi.app.logger.error("Execute of Actor %s failed, removed from execute list" % id)  
-                function_actor_ids.remove(id)      
-      
+                function_actor_ids.remove(id)   
       
