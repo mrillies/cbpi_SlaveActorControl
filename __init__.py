@@ -97,5 +97,5 @@ def actor_execute(api):
                 print e
                 cbpi.notify("Actor Error", "Failed to execute actor %s. Please update the configuraiton" % actor.name, type="danger", timeout=0)
                 cbpi.app.logger.error("Execute of Actor %s failed, removed from execute list" % id)  
-                function_actor_ids.remove(id)   
+                master_actor_ids.remove(id)   
       
